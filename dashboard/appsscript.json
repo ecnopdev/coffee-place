@@ -1,0 +1,15 @@
+{
+  "timeZone": "Asia/Hong_Kong",
+  "dependencies": {
+    "libraries": [{
+      "userSymbol": "FirebaseApp",
+      "libraryId": "1hguuh4Zx72XVC1Zldm_vTtcUUKUA6iBUOoGnJUWLfqDWx5WlOJHqYkrt",
+      "version": "11"
+    }]
+  },
+  "webapp": {
+    "access": "DOMAIN",
+    "executeAs": "USER_ACCESSING"
+  },
+  "exceptionLogging": "STACKDRIVER"
+}

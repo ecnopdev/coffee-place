@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/6.1.0/firebase-app.js"></script>
+
+<!-- Firebase App is always required and must be first 
+<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-app.js"></script> -->
+
+<!-- Add additional services that you want to use -->
+<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-messaging.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-functions.js"></script>
+
+
+<script>
+
+var firebaseConfig = {
+    apiKey: "AIzaSyAL18Lky03Sshe_sAsZ1uannJrZ34i7kzY",
+    authDomain: "dev-emtm-hermes.firebaseapp.com",
+    databaseURL: "https://dev-ntof.firebaseio.com",
+    projectId: "dev-emtm-hermes",
+    storageBucket: "dev-emtm-hermes.appspot.com",
+    messagingSenderId: "534979046513",
+    appId: "1:534979046513:web:ea34c7766506b008"
+  };  
+  
+  
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  
+  var database = firebase.database();
+  var chartRef = firebase.database().ref('Stats/');
+  chartRef.on('child_changed', function(snapshot) {
+//    console.log(snapshot.val());
+    
+    //update chart data
+
+    google.script.run
+        .withSuccessHandler(function(data){
+           console.log(data);
+           var chartContainer = document.getElementById("chartContainer");
+           chartContainer.innerHTML = data;
+        })
+        .getStatsTemplates();
+  });  
+  
+  
+</script>
+
+<style>
+html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+
+// iphone
+@media only screen 
+and (min-device-width : 375px) 
+and (max-device-width : 667px) { 
+
+
+  header {
+     margin: 0px 0px 30px 100px;
+  }
+  
+  header .board {
+     display: none;        
+  }
+  
+  header .iboard {
+     display: block;        
+  }
+  
+  .w3-quarter {
+     width:80%;
+     height:auto;
+     margin: 0px 0px 10px 100px;
+  }
+ 
+  h3 {
+       font-size: 500%;     
+   }
+  h4 {
+       font-size: 400%;     
+   }
+  h5 {
+       font-size: 300%;     
+   }
+   
+  a {
+       font-size: 300%;     
+  }
+  
+}
+
+</style>
+
+<script src="https://kit.fontawesome.com/1e077d557e.js"></script>
+
+</head>
+
+<!-- <body class="w3-light-grey"> -->
+
+<body>
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:30px;margin-top:43px;">
+
+  <!-- Header -->
+  <header class="w3-container">
+      <h5><img src="https://storage.googleapis.com/coffee-shop-638ff.appspot.com/sphtech.gif" style="width:8%"><b>Welcome to eQueue</b></h5>
+  </header>
+  
+ 
+  <div class="w3-row-padding w3-margin-bottom">
+  
+  <div id="chartContainer">
+    <?!= getStatsTemplates(); ?>
+  </div>  
+  </div>
+
+   <a href="https://script.google.com/a/sph.com.sg/macros/s/AKfycbxNyBE_cPGsK-2Zatb8c4NoyNQMZJexNRaIdY-bpYkO/dev" class="w3-button w3-khaki">Go to console</a>
+
+</div>
+
+<div class="w3-display-bottommiddle">Copyright@ 2019 SPHTech</div>
+
+<script>
+function myFunction() {
+  var x = document.getElementById("myDIV");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+</script>
+</body>
+</html>
