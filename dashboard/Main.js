@@ -16,18 +16,20 @@ var FINAL_CHART_MARKUP = "";
 var FINAL_TABLE_MARKUP = "";
 var FINAL_DATE_MARKUP = "";
 
+var firebaseUrl = "https://dev-ntof.firebaseio.com/"; 
+var secret = "eLEwdq64g8Fr91hu5tf4TAHb0Ef8Mnwla0CrnPpA";
+var base = FirebaseApp.getDatabaseByUrl(firebaseUrl, secret);
 
-  var firebaseUrl = "https://dev-ntof.firebaseio.com/"; 
-  var secret = "eLEwdq64g8Fr91hu5tf4TAHb0Ef8Mnwla0CrnPpA";
-  var base = FirebaseApp.getDatabaseByUrl(firebaseUrl, secret);
-
+FirebaseService.init();  
 
 function doGet(e) {
   return HtmlService
       .createTemplateFromFile('index')
       .evaluate()
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);  
+      .setTitle("SPHTech eQueue")
+      .addMetaTag("viewport","width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui");
+      /*.setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);*/  
 }
 
 function include(filename) {
@@ -40,12 +42,11 @@ function getStats(){
   var curStatsMarkup1 = "";
   var curStatsMarkup2 = "";
   var resultMarkup = "";
-  
+ /* 
  var mydata =  base.getData("Stats/Queue");
   for(var i in mydata) {
           var email = mydata[i];
           if(email){
-//          var email = mydata[i].emailAddress;
             if(email.emailAddress == 'quekch@sph.com.sg'){
               Logger.log(email.emailAddress + " : " + email.qNo);
               
@@ -58,7 +59,7 @@ function getStats(){
             }
           }
   }
-  
+  */
   for( var i=1; i<=3; i++) {
       var data =  base.getData("Stats/" + i);
           var Title = data.Title;

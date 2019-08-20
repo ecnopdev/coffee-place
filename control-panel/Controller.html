@@ -2,8 +2,10 @@
     var mainApp = new Vue({ 
         el:"#app", 
         data: {
+            audioFileLocation: "https://storage.googleapis.com/coffee-shop-638ff.appspot.com/front-desk-bells-daniel_simon.mp3",
             testMessage:"Hello World",
             orderList:[],
+            orderListMore:[],
             servingSlot1:null,
             servingSlot2:null,
             showSnackBar:false,
@@ -23,14 +25,59 @@
             // Initialize Firebase
              this.firebaseDb = firebase.initializeApp(this.firebaseConfig);          
         },
+        computed: {
+            closeOrders: function(){
+                return this.orderList.filter(function (order,index) {
+                    return index < 9
+                });
+            },
+            moreOrders: function(){
+                return this.orderList.filter(function (order,index) {
+                    return index > 8
+                });
+            }        
+        },
         mounted: function(){
-            this.getPendingOrders().then(results =>{
-                this.orderList = results;
+            //Listen to changes
+            var orderRef = this.firebaseDb.database().ref("/new");
+            orderRef.on("child_added",data => {
+                this.addOrderToList(data.key,data.val());
+            });
+
+            var nowServing = this.firebaseDb.database().ref("/nowServing");
+            nowServing.once("value",snapshot => {
+                var curOrders = snapshot.val();
+
+                for(var key in curOrders){
+                    if(this.servingSlot1 == null){
+                        this.servingSlot1 = curOrders[key];
+                    }
+                    else if(this.servingSlot2 == null){
+                        this.servingSlot2 = curOrders[key];
+                    }
+                }
             });
         },
         methods: {
-            helloVue(){
-                alert("hello vueue");
+            addOrderToList(key,newEntry){
+                var orderListEntry = newEntry;
+                orderListEntry.spaceId = key;
+                this.orderList.push(orderListEntry);
+
+                this.orderList.sort(this.compare);
+            },
+            compare(a, b) {
+                var queueNumA = parseInt(a.orderInfo.queueNum);
+                var queueNumB = parseInt(b.orderInfo.queueNum);
+
+                if (queueNumA < queueNumB) {
+                    return -1;
+                }
+                if (queueNumA > queueNumB) {
+                    return 1;
+                }
+                // a must be equal to b
+                return 0;
             },
             getPendingOrders(){
                 return this.firebaseDb.database().ref("/new").once("value").then(snapshot => {
@@ -44,21 +91,71 @@
                     return currentOrderList;
                 });
             },
-            serveOrder(curOrder){
+            playSound(){
+                var mediaUrl = this.audioFileLocation;
+                var audio = new Audio(mediaUrl);
+                audio.play();
+            },
+            serveOrder(curOrder,index){
 
-                if(this.servingSlot1 === null){
-                    this.servingSlot1 = curOrder;
-                }else if(this.servingSlot2 === null){
-                    this.servingSlot2 = curOrder;    
-                }else{
+                if(this.servingSlot1 !== null && this.servingSlot2 !== null){
+                    this.snackBarText = "All hands are full..";
                     this.showSnackBar = true;
+                    return "All hands are full";
+                }else {
+                    this.orderList.splice(index,1);
                 }
 
-                this.sendMessageToCustomer(curOrder.spaceId,"Please proceed to the coffee booth to get yout drink. Thank you.");
+                if(this.servingSlot1 === null){
+                    this.servingSlot1 = curOrder;                 
+                }else if(this.servingSlot2 === null){
+                    this.servingSlot2 = curOrder;                    
+                }
+
+                this.sendMessageToCustomer(curOrder.spaceId,"Please proceed to the coffee booth to get your drink. Thank you.");
+            
+                google.script.run
+                .withSuccessHandler(function(results){
+                    console.log(results);
+                })
+                .withFailureHandler(function(error){
+
+                })
+                .serveOrder(curOrder);
+
+                return "Order is served";
+
             },
-            completeOrder(slotNum,spaceId){
-                this.sendMessageToCustomer(this["servingSlot"+slotNum].spaceId,"Enjoy your drink. Please give us some feedback through this link.");
+            completeOrder(slotNum,spaceId,order){
+                this.sendMessageToCustomer(this["servingSlot"+slotNum].spaceId,"Enjoy your drink. Have a nice day.");
                 this["servingSlot"+slotNum] = null;
+
+                google.script.run
+                .withSuccessHandler(function(results){
+                    console.log(results);
+                })
+                .withFailureHandler(function(error){
+
+                })
+                .completeOrder(order);
+            },
+            resendMessage(spaceId){
+                this.sendMessageToCustomer(spaceId,"Hi there! Your number is up. Please proceed to the booth to get your drink. Thank you.");           
+                this.snackBarText = "Message sent";
+                this.showSnackBar = true;
+            },
+            returnToQueue(slotNum,order){
+                this["servingSlot"+slotNum] = null;
+
+                google.script.run
+                .withSuccessHandler(response => {          
+                    this.snackBarText = "Order was sent back to the queue.";
+                    this.showSnackBar = true;
+                })
+                .withFailureHandler(error => {
+
+                })
+                .returnToQueue(order);
             },
             sendMessageToCustomer(spaceId,message){
                 google.script.run

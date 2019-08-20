@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+<link href="https://storage.googleapis.com/dev-emtm-hermes.appspot.com/js/vuetify_css_min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://storage.googleapis.com/dev-emtm-hermes.appspot.com/js/vuetify_min.js"></script>
 
 <!-- The core Firebase JS SDK is always required and must be listed first -->
 <script src="https://www.gstatic.com/firebasejs/6.1.0/firebase-app.js"></script>
@@ -15,119 +19,136 @@
 <!-- Add additional services that you want to use -->
 <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-messaging.js"></script>
-<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-functions.js"></script>
-
-
-<script>
-
-var firebaseConfig = {
-    apiKey: "AIzaSyAL18Lky03Sshe_sAsZ1uannJrZ34i7kzY",
-    authDomain: "dev-emtm-hermes.firebaseapp.com",
-    databaseURL: "https://dev-ntof.firebaseio.com",
-    projectId: "dev-emtm-hermes",
-    storageBucket: "dev-emtm-hermes.appspot.com",
-    messagingSenderId: "534979046513",
-    appId: "1:534979046513:web:ea34c7766506b008"
-  };  
-  
-  
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  
-  var database = firebase.database();
-  var chartRef = firebase.database().ref('Stats/');
-  chartRef.on('child_changed', function(snapshot) {
-//    console.log(snapshot.val());
-    
-    //update chart data
-
-    google.script.run
-        .withSuccessHandler(function(data){
-           console.log(data);
-           var chartContainer = document.getElementById("chartContainer");
-           chartContainer.innerHTML = data;
-        })
-        .getStatsTemplates();
-  });  
-  
-  
-</script>
 
 <style>
-html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
-
-// iphone
-@media only screen 
-and (min-device-width : 375px) 
-and (max-device-width : 667px) { 
-
-
-  header {
-     margin: 0px 0px 30px 100px;
-  }
-  
-  header .board {
-     display: none;        
-  }
-  
-  header .iboard {
-     display: block;        
-  }
-  
-  .w3-quarter {
-     width:80%;
-     height:auto;
-     margin: 0px 0px 10px 100px;
-  }
- 
-  h3 {
-       font-size: 500%;     
-   }
-  h4 {
-       font-size: 400%;     
-   }
-  h5 {
-       font-size: 300%;     
-   }
-   
-  a {
-       font-size: 300%;     
-  }
-  
+img {
+ width:40%;
 }
 
+.queue-number-slot{
+  border:white solid 3px;
+  min-height:415px;
+  font-size:4em;
+}
+
+.slot-available {
+  margin-top:15%;
+}
+
+.queue-number {
+  font-size:4em
+}
+
+@media (max-width:600px) {
+
+  img {
+    width:20%;
+  }
+
+  .queue-number-slot{
+    min-height:200px;
+    font-size:3em;
+  }
+
+  .slot-available {
+    margin-top:8%;
+  }
+
+  .queue-number {
+    font-size:2em
+  }
+}
 </style>
 
 <script src="https://kit.fontawesome.com/1e077d557e.js"></script>
+
+<script>
+function startTime() {
+  var today = new Date();
+  var h = today.getHours();
+  var m = today.getMinutes();
+  var s = today.getSeconds();
+  m = checkTime(m);
+  s = checkTime(s);
+  document.getElementById('txt').innerHTML =
+  h + ":" + m + ":" + s;
+  var t = setTimeout(startTime, 500);
+}
+function checkTime(i) {
+  if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+  return i;
+}
+</script>
 
 </head>
 
 <!-- <body class="w3-light-grey"> -->
 
-<body>
-<!-- !PAGE CONTENT! -->
-<div class="w3-main" style="margin-left:30px;margin-top:43px;">
-
-  <!-- Header -->
-  <header class="w3-container">
-      <h5><img src="https://storage.googleapis.com/coffee-shop-638ff.appspot.com/sphtech.gif" style="width:8%"><b>Welcome to eQueue</b></h5>
-  </header>
-  
- 
-  <div class="w3-row-padding w3-margin-bottom">
-  
-  <div id="chartContainer">
-    <?!= getStatsTemplates(); ?>
-  </div>  
-  </div>
-
-   <a href="https://script.google.com/a/sph.com.sg/macros/s/AKfycbxNyBE_cPGsK-2Zatb8c4NoyNQMZJexNRaIdY-bpYkO/dev" class="w3-button w3-khaki">Go to console</a>
-
-</div>
-
-<div class="w3-display-bottommiddle">Copyright@ 2019 SPHTech</div>
+<body onload="startTime()">
+    <div style="display:block;position:relative;max-height:100vh;width:100vw;height:100vh;overflow:scroll;scroll-behavior:smooth"> 
+        <v-app id="app" light style="background-color:white"> 
+                <v-layout column>
+                    <v-flex style="min-height:120px" class="pa-3" xs12>
+                    <v-layout row wrap>
+                      <v-flex sm3 xs12 align-self-center class="text-xs-center text-sm-left">
+                          <img src="https://storage.googleapis.com/coffee-shop-638ff.appspot.com/sphtech.gif">
+                      </v-flex>
+                      <v-flex sm6 xs12  align-self-center class="text-xs-center">
+                          <div style="font-size:100px" class="font-weight-black hidden-xs-only">Now Serving</div>
+                          <div class="display-3 font-weight-black hidden-sm-and-up">Now Serving</div>
+                      </v-flex>
+                      <v-flex sm3 xs12 align-self-center class="text-xs-center text-sm-right" pr-3 hidden-xs-only>
+                          <div id="txt" class="display-3 font-weight-thin"></div>
+                      </v-flex>
+                    </v-layout>                     
+                  </v-flex>
+                  <v-flex xs12 class="brown lighten-3">
+                        <v-layout row wrap fill-height>
+                          <v-flex align-self-center class="queue-number-slot" xs12 sm6>
+                            <v-layout column fill-height>
+                              <v-flex xs12>
+                              <div class="text-xs-center slot-available" v-if="servingSlot1 === null">
+                                <span>Slot</span>
+                                  <br> 
+                                <span>Available</span>
+                              </div>
+                              <div class="pa-3 text-xs-center" v-else>
+                                  <div class="pa-2 text-xs-center">
+                                      <div>
+                                        <!-- <v-avatar size=200>
+                                          <v-img :src="servingSlot1.userInfo.avatarUrl"></v-img>
+                                        </v-avatar> -->
+                                        <span class="queue-number">{{servingSlot1.orderInfo.queueNum}}</span>
+                                      </div>
+                                  </div>
+                                  <!-- <div class="display-2 pa-2 mt-2">{{servingSlot1.orderInfo.drink}}</div> -->
+                              </div>
+                            </v-flex>
+                          </v-layout>
+                          </v-flex>
+                          <v-flex align-self-center class="queue-number-slot"  xs12 sm6>
+                              <div class="text-xs-center slot-available"  v-if="servingSlot2 === null">
+                                <span>Slot</span>
+                                  <br> 
+                                <span>Available</span>
+                              </div>
+                              <div class="pa-3 text-xs-center" v-else>
+                                  <div class="pa-2 text-xs-center">
+                                      <div>
+                                        <!-- <v-avatar size=150>
+                                          <v-img :src="servingSlot2.userInfo.avatarUrl"></v-img>
+                                        </v-avatar> -->
+                                        <span class="queue-number">{{servingSlot2.orderInfo.queueNum}}</span>
+                                      </div>
+                                  </div>
+                                  <!-- <div class="title pa-2">{{servingSlot2.orderInfo.drink}}</div> -->
+                              </div>
+                          </v-flex>
+                        </v-layout>
+                      </v-flex>              
+</v-layout>
+</v-app>
+</div> 
 
 <script>
 function myFunction() {
@@ -139,5 +160,6 @@ function myFunction() {
   }
 }
 </script>
+<?!= include('Controller') ?>
 </body>
 </html>

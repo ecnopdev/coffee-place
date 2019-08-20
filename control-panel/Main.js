@@ -1,47 +1,13 @@
-var APP_SHEET_ID = "1ujfp9HOlDKKtXWcXi9zpj4bOr11bqSfNQwnz_UTHMII";
-var Setup = "setup";
-var APPS = "nominations";
-var AWARDS = "awards";
-var RES = "best story query";
-//var RESPONSE = 'best story response';
-var RESPONSE = 'response';
-var Vote = [];
-var FINAL_FORM_MARKUP = "";
-var ss = SpreadsheetApp.openById(APP_SHEET_ID);
-var userProperties = PropertiesService.getUserProperties();
-var category = "Story of the Month";
-
-var FINAL_STATS_MARKUP = "";
-var FINAL_CHART_MARKUP = "";
-var FINAL_TABLE_MARKUP = "";
-var FINAL_DATE_MARKUP = "";
-
-
-  var firebaseUrl = "https://dev-ntof.firebaseio.com/"; 
-  var secret = "eLEwdq64g8Fr91hu5tf4TAHb0Ef8Mnwla0CrnPpA";
-  var base = FirebaseApp.getDatabaseByUrl(firebaseUrl, secret);
-
-
-function oneOffSetting() { 
-  var file = DriveApp.getFilesByName('coffee-shop-638ff-260e883e6c4e.json').next();
-  // used by all using this script
-  var propertyStore = PropertiesService.getScriptProperties();
-  // service account for our Dialogflow agent
-  cGoa.GoaApp.setPackage (propertyStore , 
-    cGoa.GoaApp.createServiceAccount (DriveApp , {
-      packageName: 'dialogflow_serviceaccount',
-      fileId: file.getId(),
-      scopes : cGoa.GoaApp.scopesGoogleExpand (['cloud-platform']),
-      service:'google_service'
-    }));
-}
+FirebaseService.init();
 
 function doGet(e) {
+
   return HtmlService
       .createTemplateFromFile('index')
       .evaluate()
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);  
+      .setHeight(30)
+      .setTitle("SPHTech Day Coffee Place")
+      .addMetaTag("viewport","width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui");
 }
 
 function include(filename) {
@@ -49,7 +15,71 @@ function include(filename) {
       .getContent();
 }
 
+function serveOrder(payload) {
+  FirebaseService.updateData('nowServing/'+payload.spaceId,payload);
+  FirebaseService.removeData('new/'+payload.spaceId);
+
+  return {
+    status:200,
+    message:"Order was served successfully"
+  };
+} 
+
+function completeOrder(payload) {
+  FirebaseService.removeData('nowServing/'+payload.spaceId);
+  FirebaseService.updateData('doneServing/'+payload.spaceId,payload);
+
+  return {
+    status:200,
+    message:"Order was completed"
+  };
+}
+
+function returnToQueue(payload) {
+  FirebaseService.removeData('nowServing/'+payload.spaceId);
+  FirebaseService.updateData('new/'+payload.spaceId,payload);
+
+  return {
+    status:200,
+    message:"Order was returned to queue"
+  };  
+}
+
 function sendMessageToUser(spaceId,message){
   return ChatBotService.sendMessage(spaceId,message);
 }
 
+
+
+function validateSpaceId(){
+
+}
+
+function populateTestData(){
+  var spaceId = "5ltwEgAAAAE";
+  var timestamp = new Date();
+  var newOrder = {
+    orderInfo:{
+      drink: "Hot Chocolate",
+      queueNum:1,
+      timestamp:timestamp.getTime()
+    },
+    spaceId:spaceId,
+    userInfo:{
+      avatarUrl:"https://lh3.googleusercontent.com/a-/AAuE7mBgGsoVUVXfEblHkt_eYkLEd5noT1rjbYxy3YUfvQ",
+      displayName:"KSS Jose Mari Ponce",
+      email: "kssjmpv1@sph.com.sg",
+      name: "users/102483854431126509275",
+      type: "HUMAN"
+    }
+  }
+
+  for(var i=1; i<100; i++){
+    var curSpaceId = spaceId + i;
+    newOrder.spaceId = curSpaceId;
+    newOrder.orderInfo.queueNum = i;
+    FirebaseService.updateData("new/" + curSpaceId,newOrder);
+  }
+
+
+}

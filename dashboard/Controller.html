@@ -1,0 +1,75 @@
+<script>
+        var mainApp = new Vue({ 
+            el:"#app", 
+            data: {
+                message:"Coffee Bot",
+                servingSlot1:null,
+                servingSlot2:null,
+                firebaseConfig : {
+                      apiKey: "AIzaSyApK1G61oVD_sUaNfiIFmEh43eM2Gaoyow",
+                      authDomain: "coffee-shop-638ff.firebaseapp.com",
+                      databaseURL: "https://coffee-shop-638ff.firebaseio.com",
+                      projectId: "coffee-shop-638ff",
+                      storageBucket: "coffee-shop-638ff.appspot.com",
+                      messagingSenderId: "562451150203",
+                      appId: "1:562451150203:web:c9f97a8f46dd59bb"
+                },
+                firebaseDb : {},
+            },
+            created: function(){
+            // Initialize Firebase
+             this.firebaseDb = firebase.initializeApp(this.firebaseConfig);          
+            },
+            mounted: function() {
+
+                var nowServing = this.firebaseDb.database().ref("/nowServing");
+                nowServing.on("child_added",snapshot => {
+
+                    var curOrder = snapshot.val();
+
+                    if(this.servingSlot1 == null){
+                        this.servingSlot1 = curOrder;
+                    }
+                    else if(this.servingSlot2 == null){
+                        this.servingSlot2 = curOrder;
+                    }
+
+                    this.playSound();
+
+                }, error => {
+                    console.log(error);
+                });
+
+                nowServing.on("child_removed",snapshot =>{
+                    console.log("child removed");
+                    this.servingSlot1 = null;
+                    this.servingSlot2 = null;
+                    nowServing.once("value",snapshot2 => {
+                    var curOrders = snapshot2.val();
+
+                    for(var key in curOrders){
+                        if(this.servingSlot1 == null){
+                            this.servingSlot1 = curOrders[key];
+                        }
+                        else if(this.servingSlot2 == null){
+                            this.servingSlot2 = curOrders[key];
+                        }
+                    }
+                    });
+                });
+            },
+            methods: {
+                playSound(){
+                    try{
+                        var mediaUrl = "https://storage.googleapis.com/coffee-shop-638ff.appspot.com/front-desk-bells-daniel_simon.mp3";
+                        var audio = new Audio(mediaUrl);
+                        audio.play();
+                    }catch(e){
+                        console.log(e);
+                    }
+                }
+            }
+        });
+</script>
+        
+        

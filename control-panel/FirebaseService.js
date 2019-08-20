@@ -15,10 +15,10 @@ var FirebaseService = (function() {
       return db.getData(path);
     },
     updateData: function(path,data){
-      db.updateData(path,data)
+      db.updateData(path,data);
     },
-    removeData: function(path,data){
-      db.setData(path,null);
+    removeData: function(path){
+      db.removeData(path);
     }
   }
   
