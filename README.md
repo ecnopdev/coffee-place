@@ -1,2 +1,2 @@
 # coffee-place
-Simple Queuing System For SPH Tech Day 
+Simple Real-time Queuing System using Dialog Flow and Firebase.
